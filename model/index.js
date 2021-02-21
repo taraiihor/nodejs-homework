@@ -77,28 +77,29 @@ const addContact = async (body) => {
 }
 
 const updateContact = async (id, body) => {
-  // const data = await fs.readFile(contactsPath, 'utf8');
-  // const result = JSON.parse(data);
-  // let newContact = {};
+//   try{
+//     const data = await fs.readFile(contactsPath, 'utf8');
+//   const result = JSON.parse(data);
+//   let newContact = {};
 
-  // const updateContacts = result.map((contact) => {
-  //   if (contact.id.toString() === id) {
-  //     newContact = {
-  //       ...contact,
-  //       ...body,
-  //     };
+//   const updateContacts = result.map((contact) => {
+//     if (contact.id.toString() === id) {
+//       newContact = {
+//         ...contact,
+//         ...body,
+//       };
 
-  //     return newContact;
-  //   } else {
-  //     return contact;
-  //   }
-  // });
+//       return newContact;
+//     } else {
+//       return contact;
+//     }
+//   });
 
-  // await fs.writeFile(contactsPath, JSON.stringify(updateContacts), (err) =>
-  //   console.log(err)
-  // );
-
-  // return updateContacts;
+//   await fs.writeFile(contactsPath, JSON.stringify(updateContacts));
+//   return updateContacts;
+// }catch (error){
+//     console.log(error);
+//   }
   const record = db.get('contacts').find({ id }).assign(body).value()
   db.write()
   return record.id ? record : null
