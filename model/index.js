@@ -3,7 +3,7 @@
 // const contactsPath = path.resolve('model/contacts.json');
 
 const db = require('./db')
-const {v4: uuidv4} = require('uuid')
+const { v4: uuidv4 } = require('uuid')
 
 const listContacts = async () => {
   // try {
@@ -16,7 +16,7 @@ const listContacts = async () => {
   return db.get('contacts').value()
 }
 
-const getContactById = async (id) => {
+const getContactById = async id => {
   // try {
   //   const data = await fs.readFile(contactsPath, 'utf8');
   //   const result = JSON.parse(data).find(contact => contact.id.toString() === id);
@@ -27,7 +27,7 @@ const getContactById = async (id) => {
   return db.get('contacts').find({ id }).value()
 }
 
-const removeContact = async (id) => {
+const removeContact = async id => {
   // try {
   //   const data = await fs.readFile(contactsPath, 'utf8');
   //   const result = JSON.parse(data).filter(contact => contact.id !== id);
@@ -42,10 +42,10 @@ const removeContact = async (id) => {
   //   } else {
   //     return true;
   //   }
-    
+
   // });
   // await fs.writeFile(contactsPath, JSON.stringify(newContacts));
-  
+
   // return deletedContact;
 
   // } catch (error) {
@@ -56,7 +56,7 @@ const removeContact = async (id) => {
   return record
 }
 
-const addContact = async (body) => {
+const addContact = async body => {
   // try {
   //   const data = await fs.readFile(contactsPath, 'utf8');
   //   const result = JSON.parse(data);
@@ -70,36 +70,36 @@ const addContact = async (body) => {
   const id = uuidv4()
   const record = {
     id,
-    ... body,    
+    ...body,
   }
   db.get('contacts').push(record).write()
   return record
 }
 
 const updateContact = async (id, body) => {
-//   try{
-//     const data = await fs.readFile(contactsPath, 'utf8');
-//   const result = JSON.parse(data);
-//   let newContact = {};
+  //   try{
+  //     const data = await fs.readFile(contactsPath, 'utf8');
+  //   const result = JSON.parse(data);
+  //   let newContact = {};
 
-//   const updateContacts = result.map((contact) => {
-//     if (contact.id.toString() === id) {
-//       newContact = {
-//         ...contact,
-//         ...body,
-//       };
+  //   const updateContacts = result.map((contact) => {
+  //     if (contact.id.toString() === id) {
+  //       newContact = {
+  //         ...contact,
+  //         ...body,
+  //       };
 
-//       return newContact;
-//     } else {
-//       return contact;
-//     }
-//   });
+  //       return newContact;
+  //     } else {
+  //       return contact;
+  //     }
+  //   });
 
-//   await fs.writeFile(contactsPath, JSON.stringify(updateContacts));
-//   return updateContacts;
-// }catch (error){
-//     console.log(error);
-//   }
+  //   await fs.writeFile(contactsPath, JSON.stringify(updateContacts));
+  //   return updateContacts;
+  // }catch (error){
+  //     console.log(error);
+  //   }
   const record = db.get('contacts').find({ id }).assign(body).value()
   db.write()
   return record.id ? record : null
