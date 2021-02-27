@@ -6,11 +6,11 @@ const contactSchema = new Schema(
     name: {
       type: String,
       require: [true, 'Set name for contact'],
-      unique: true,
     },
     email: {
       type: String,
       require: [true, 'Set email for contact'],
+      unique: true,
     },
     phone: {
       type: String,
