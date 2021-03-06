@@ -1,24 +1,24 @@
-const mongoose = require('mongoose')
-const { Schema, model } = mongoose
+const { Schema, model, SchemaTypes } = require('mongoose')
 
-const contactSchema = new Schema(
-  {
-    name: {
-      type: String,
-      require: [true, 'Set name for contact'],
-    },
-    email: {
-      type: String,
-      require: [true, 'Set email for contact'],
-      unique: true,
-    },
-    phone: {
-      type: String,
-      require: [true, 'Set phone for contact'],
-    },
+const contactSchema = new Schema({
+  name: {
+    type: String,
+    require: [true, 'Set name for contact'],
+    unique: true,
   },
-  { versionKey: false, timestamps: true },
-)
+  email: {
+    type: String,
+    require: [true, 'Set email for contact'],
+  },
+  phone: {
+    type: String,
+    require: [true, 'Set phone for contact'],
+  },
+  owner: {
+    type: SchemaTypes.ObjectId,
+    ref: 'user',
+  },
+})
 
 const Contact = model('contact', contactSchema)
 
