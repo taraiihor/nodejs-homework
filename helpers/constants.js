@@ -1,7 +1,7 @@
-const Sex = {
-  MALE: 'm',
-  FEMALE: 'f',
-  NONE: 'none',
+const Subscription = {
+  FREE: 'free',
+  PRO: 'pro',
+  PREMIUM: 'premium',
 }
 const HttpCode = {
   OK: 200,
@@ -14,6 +14,6 @@ const HttpCode = {
   INTERNAL_SERVER_ERROR: 500,
 }
 module.exports = {
-  Sex,
   HttpCode,
+  Subscription,
 }

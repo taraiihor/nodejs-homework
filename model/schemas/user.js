@@ -1,23 +1,10 @@
 const { Schema, model } = require('mongoose')
 const bcrypt = require('bcryptjs')
 const SALT_WORK_FACTOR = 8
-const { Sex } = require('../../helpers/constants')
+const { Subscription } = require('../../helpers/constants')
 
 const userSchema = new Schema(
   {
-    name: {
-      type: String,
-      minlength: 3,
-      default: 'Guest',
-    },
-    sex: {
-      type: String,
-      enum: {
-        values: [Sex.MALE, Sex.FEMALE, Sex.NONE],
-        message: "It isn't alowed",
-      },
-      default: Sex.NONE,
-    },
     email: {
       type: String,
       required: [true, 'Email required'],
@@ -30,6 +17,11 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: [true, 'Password required'],
+    },
+    subscription: {
+      type: String,
+      enum: [Subscription.FREE, Subscription.PRO, Subscription.PREMIUM],
+      default: Subscription.FREE,
     },
     token: {
       type: String,
