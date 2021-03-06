@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken')
 const Users = require('../model/users')
-const { HttpCode } = require('../helpers/constants')
-// const { use } = require('../routes/api/users')
+const { HttpCode, Subscriptions } = require('../helpers/constants')
 require('dotenv').config()
 const SECRET_KEY = process.env.JWT_SECRET
 
@@ -24,7 +23,7 @@ const reg = async (req, res, next) => {
       data: {
         id: newUser.id,
         email: newUser.email,
-        name: newUser.name,
+        subscription: newUser.subscription,
       },
     })
   } catch (e) {
@@ -36,7 +35,8 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body
     const user = await Users.findByEmail(email)
-    if (!user || !user.validate(password)) {
+    const isPasswordValid = await user.validPassword(password)
+    if (!user || !isPasswordValid) {
       return res.status(HttpCode.UNAUTHORIZED).json({
         status: 'error',
         code: HttpCode.UNAUTHORIZED,
@@ -53,6 +53,10 @@ const login = async (req, res, next) => {
       code: HttpCode.OK,
       data: {
         token,
+        user: {
+          email,
+          subscription: Subscriptions.FREE,
+        },
       },
     })
   } catch (e) {
@@ -64,5 +68,23 @@ const logout = async (req, res, next) => {
   await Users.updateToken(userId, null)
   return res.status(HttpCode.NO_CONTENT).json({ message: 'Nothing' })
 }
+const currentUser = async (req, res, next) => {
+  try {
+    const token = req.token
+    const user = await Users.findByToken(token)
 
-module.exports = { reg, login, logout }
+    return res.status(HttpCode.OK).json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: 'OK',
+      body: {
+        email: user.email,
+        subscription: user.subscription,
+      },
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { reg, login, logout, currentUser }

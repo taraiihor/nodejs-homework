@@ -1,7 +1,7 @@
 const { Schema, model } = require('mongoose')
 const bcrypt = require('bcryptjs')
 const SALT_WORK_FACTOR = 8
-const { Subscription } = require('../../helpers/constants')
+const { Subscriptions } = require('../../helpers/constants')
 
 const userSchema = new Schema(
   {
@@ -20,8 +20,8 @@ const userSchema = new Schema(
     },
     subscription: {
       type: String,
-      enum: [Subscription.FREE, Subscription.PRO, Subscription.PREMIUM],
-      default: Subscription.FREE,
+      enum: [Subscriptions.FREE, Subscriptions.PRO, Subscriptions.PREMIUM],
+      default: Subscriptions.FREE,
     },
     token: {
       type: String,
@@ -39,7 +39,7 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
-userSchema.method.validPassword = async function (password) {
+userSchema.methods.validPassword = async function (password) {
   return await bcrypt.compare(password, this.password)
 }
 

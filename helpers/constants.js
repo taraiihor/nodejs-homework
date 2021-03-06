@@ -1,4 +1,4 @@
-const Subscription = {
+const Subscriptions = {
   FREE: 'free',
   PRO: 'pro',
   PREMIUM: 'premium',
@@ -15,5 +15,5 @@ const HttpCode = {
 }
 module.exports = {
   HttpCode,
-  Subscription,
+  Subscriptions,
 }
