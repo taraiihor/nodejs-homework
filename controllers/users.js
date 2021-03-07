@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const Users = require('../model/users')
 const { HttpCode, Subscriptions } = require('../helpers/constants')
+
 require('dotenv').config()
 const SECRET_KEY = process.env.JWT_SECRET
 
@@ -13,7 +14,7 @@ const reg = async (req, res, next) => {
         status: 'error',
         code: HttpCode.CONFLICT,
         data: 'Conflict',
-        message: 'email is already use',
+        message: 'Email in use',
       })
     }
     const newUser = await Users.create(req.body)
@@ -21,9 +22,7 @@ const reg = async (req, res, next) => {
       status: 'success',
       code: HttpCode.CREATED,
       data: {
-        id: newUser.id,
-        email: newUser.email,
-        subscription: newUser.subscription,
+        user: { email: newUser.email, subscription: newUser.subscription },
       },
     })
   } catch (e) {
@@ -70,7 +69,7 @@ const logout = async (req, res, next) => {
 }
 const currentUser = async (req, res, next) => {
   try {
-    const token = req.token
+    const token = req.user.token
     const user = await Users.findByToken(token)
 
     return res.status(HttpCode.OK).json({
