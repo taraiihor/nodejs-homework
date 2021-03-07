@@ -14,7 +14,7 @@ const reg = async (req, res, next) => {
         status: 'error',
         code: HttpCode.CONFLICT,
         data: 'Conflict',
-        message: 'Email in use',
+        message: 'email is already use',
       })
     }
     const newUser = await Users.create(req.body)
@@ -40,7 +40,7 @@ const login = async (req, res, next) => {
         status: 'error',
         code: HttpCode.UNAUTHORIZED,
         data: 'unauthorized',
-        message: 'Invalid credentials',
+        message: 'Email in use',
       })
     }
     const id = user._id

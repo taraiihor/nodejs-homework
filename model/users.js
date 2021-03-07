@@ -19,6 +19,7 @@ const updateToken = async (id, token) => {
 const findByToken = async token => {
   return await User.findOne({ token })
 }
+
 module.exports = {
   findByEmail,
   create,

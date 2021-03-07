@@ -3,8 +3,8 @@ const Contacts = require('../model/index')
 const getContact = async (req, res, next) => {
   try {
     const userId = req.user.id
-    const contacts = await Contacts.listContacts(userId)
-    return res.json({ status: 'success', code: 200, data: { contacts } })
+    const contacts = await Contacts.listContacts(userId, req.query)
+    return res.json({ status: 'success', code: 200, data: { ...contacts } })
   } catch (e) {
     next(e)
   }
