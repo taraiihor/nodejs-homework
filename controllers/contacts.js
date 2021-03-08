@@ -2,8 +2,9 @@ const Contacts = require('../model/index')
 
 const getContact = async (req, res, next) => {
   try {
-    const contacts = await Contacts.listContacts()
-    return res.json({ status: 'success', code: 200, data: { contacts } })
+    const userId = req.user.id
+    const contacts = await Contacts.listContacts(userId, req.query)
+    return res.json({ status: 'success', code: 200, data: { ...contacts } })
   } catch (e) {
     next(e)
   }
@@ -11,7 +12,8 @@ const getContact = async (req, res, next) => {
 
 const getContactById = async (req, res, next) => {
   try {
-    const contact = await Contacts.getContactById(req.params.id)
+    const userId = req.user.id
+    const contact = await Contacts.getContactById(req.params.id, userId)
     if (contact) {
       return res.json({ status: 'success', code: 200, data: { contact } })
     } else {
@@ -28,7 +30,8 @@ const getContactById = async (req, res, next) => {
 
 const createContact = async (req, res, next) => {
   try {
-    const contact = await Contacts.addContact(req.body)
+    const userId = req.user.id
+    const contact = await Contacts.addContact({ ...req.body, owner: userId })
     return res
       .status(201)
       .json({ status: 'success', code: 201, data: { contact } })
@@ -39,7 +42,8 @@ const createContact = async (req, res, next) => {
 
 const deleteContact = async (req, res, next) => {
   try {
-    const contact = await Contacts.removeContact(req.params.id)
+    const userId = req.user.id
+    const contact = await Contacts.removeContact(req.params.id, userId)
     if (contact) {
       return res.json({ status: 'success', code: 200, data: 'contact deleted' })
     } else {
@@ -56,7 +60,12 @@ const deleteContact = async (req, res, next) => {
 
 const updateContact = async (req, res, next) => {
   try {
-    const contact = await Contacts.updateContact(req.params.id, req.body)
+    const userId = req.user.id
+    const contact = await Contacts.updateContact(
+      req.params.id,
+      req.body,
+      userId,
+    )
     if (contact) {
       return res.json({ status: 'success', code: 200, data: { contact } })
     } else {
