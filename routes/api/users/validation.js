@@ -20,3 +20,15 @@ const validate = (schema, obj, next) => {
 module.exports.schemaUser = (req, res, next) => {
   return validate(schemaUser, req.body, next)
 }
+
+module.exports.updateAvatar = (req, res, next) => {
+  if (!req.file) {
+    return res.status(400).json({
+      status: 'error',
+      code: 400,
+      data: 'Bad request',
+      message: 'File not found',
+    })
+  }
+  next()
+}
