@@ -121,7 +121,7 @@ const avatars = async (req, res, next) => {
     return res.json({
       status: 'success',
       code: HttpCode.OK,
-      data: { avatarUrl: avatarUrl },
+      data: { avatarUrl },
     })
   } catch (error) {
     next(error)
@@ -141,7 +141,7 @@ const saveAvatarUrl = async req => {
     .writeAsync(pathFile)
   await createFolderIsExist(path.join(AVATARS_OF_USERS, id))
   await fs.rename(pathFile, path.join(AVATARS_OF_USERS, id, newNameAvatar))
-  const avatarUrl = path.normalize(path.join(id, newNameAvatar))
+  const avatarUrl = path.join(id, newNameAvatar)
   try {
     await fs.unlink(
       path.join(process.cwd(), AVATARS_OF_USERS, req.user.avatarURL),
@@ -151,4 +151,5 @@ const saveAvatarUrl = async req => {
   }
   return avatarUrl
 }
+
 module.exports = { reg, login, logout, currentUser, updateSub, avatars }
