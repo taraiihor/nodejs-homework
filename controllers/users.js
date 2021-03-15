@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken')
 const Users = require('../model/users')
+const fs = require('fs').promises
+const path = require('path')
+const Jimp = require('jimp')
 const { HttpCode, Subscriptions } = require('../helpers/constants')
-
+const createFolderIsExist = require('../helpers/create-dir')
 require('dotenv').config()
 const SECRET_KEY = process.env.JWT_SECRET
 
@@ -22,7 +25,11 @@ const reg = async (req, res, next) => {
       status: 'success',
       code: HttpCode.CREATED,
       data: {
-        user: { email: newUser.email, subscription: newUser.subscription },
+        user: {
+          email: newUser.email,
+          avatar: newUser.avatar,
+          subscription: newUser.subscription,
+        },
       },
     })
   } catch (e) {
@@ -34,7 +41,7 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body
     const user = await Users.findByEmail(email)
-    const isPasswordValid = await user.validPassword(password)
+    const isPasswordValid = await user?.validPassword(password)
     if (!user || !isPasswordValid) {
       return res.status(HttpCode.UNAUTHORIZED).json({
         status: 'error',
@@ -106,5 +113,43 @@ const updateSub = async (req, res, next) => {
     next(error)
   }
 }
+const avatars = async (req, res, next) => {
+  try {
+    const id = req.user.id
+    const avatarUrl = await saveAvatarUrl(req)
+    await Users.updateAvatar(id, avatarUrl)
+    return res.json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: { avatarUrl },
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
-module.exports = { reg, login, logout, currentUser, updateSub }
+const saveAvatarUrl = async req => {
+  const id = req.user.id
+  const PUBLIC_DIR = process.env.PUBLIC_DIR
+  const AVATARS_OF_USERS = path.join(PUBLIC_DIR, process.env.AVATARS_OF_USERS)
+  const pathFile = req.file.path
+  const newNameAvatar = `${Date.now()}-${req.file.originalname}`
+  const img = await Jimp.read(pathFile)
+  await img
+    .autocrop()
+    .cover(250, 250, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE)
+    .writeAsync(pathFile)
+  await createFolderIsExist(path.join(AVATARS_OF_USERS, id))
+  await fs.rename(pathFile, path.join(AVATARS_OF_USERS, id, newNameAvatar))
+  const avatarUrl = path.join(id, newNameAvatar)
+  try {
+    await fs.unlink(
+      path.join(process.cwd(), AVATARS_OF_USERS, req.user.avatarURL),
+    )
+  } catch (error) {
+    console.log(error.message)
+  }
+  return avatarUrl
+}
+
+module.exports = { reg, login, logout, currentUser, updateSub, avatars }
