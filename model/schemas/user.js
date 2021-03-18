@@ -7,6 +7,11 @@ const SALT_WORK_FACTOR = 8
 
 const userSchema = new Schema(
   {
+    name: {
+      type: String,
+      minlength: 2,
+      default: 'Guest',
+    },
     email: {
       type: String,
       required: [true, 'Email required'],
@@ -34,6 +39,13 @@ const userSchema = new Schema(
     token: {
       type: String,
       default: null,
+    },
+    verify: {
+      type: Boolean,
+    },
+    verifyToken: {
+      type: String,
+      required: [true, 'Verify token required'],
     },
   },
   { versionKey: false, timestamps: true },
