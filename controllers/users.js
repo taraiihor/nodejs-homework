@@ -5,12 +5,14 @@ const path = require('path')
 const Jimp = require('jimp')
 const { HttpCode, Subscriptions } = require('../helpers/constants')
 const createFolderIsExist = require('../helpers/create-dir')
+const { nanoid } = require('nanoid')
+const EmailService = require('../services/email')
 require('dotenv').config()
 const SECRET_KEY = process.env.JWT_SECRET
 
 const reg = async (req, res, next) => {
   try {
-    const { email } = req.body
+    const { email, name } = req.body
     const user = await Users.findByEmail(email)
     if (user) {
       return res.status(HttpCode.CONFLICT).json({
@@ -20,7 +22,14 @@ const reg = async (req, res, next) => {
         message: 'email is already use',
       })
     }
-    const newUser = await Users.create(req.body)
+    const verifyToken = nanoid()
+    const emailService = new EmailService(process.send.NODE_ENV)
+    await emailService.sendEmail(verifyToken, email, name)
+    const newUser = await Users.create({
+      ...req.body,
+      verify: false,
+      verifyToken,
+    })
     return res.status(HttpCode.CREATED).json({
       status: 'success',
       code: HttpCode.CREATED,
@@ -28,6 +37,7 @@ const reg = async (req, res, next) => {
         user: {
           email: newUser.email,
           avatar: newUser.avatar,
+          name: newUser.name,
           subscription: newUser.subscription,
         },
       },
@@ -42,7 +52,7 @@ const login = async (req, res, next) => {
     const { email, password } = req.body
     const user = await Users.findByEmail(email)
     const isPasswordValid = await user?.validPassword(password)
-    if (!user || !isPasswordValid) {
+    if (!user || !isPasswordValid || !user.verify) {
       return res.status(HttpCode.UNAUTHORIZED).json({
         status: 'error',
         code: HttpCode.UNAUTHORIZED,
@@ -151,5 +161,25 @@ const saveAvatarUrl = async req => {
   }
   return avatarUrl
 }
-
-module.exports = { reg, login, logout, currentUser, updateSub, avatars }
+const verify = async (req, res, next) => {
+  try {
+    const user = await Users.findByVerifyToken(req.params.token)
+    if (user) {
+      await Users.updateVerifyToken(user.id, true, null)
+      return res.json({
+        status: 'success',
+        code: HttpCode.OK,
+        message: 'verification success',
+      })
+    }
+    return res.status(HttpCode.BAD_REQUEST).json({
+      status: 'error',
+      code: HttpCode.BAD_REQUEST,
+      data: 'Bad request',
+      message: 'Link is no valid',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+module.exports = { reg, login, logout, currentUser, updateSub, avatars, verify }
